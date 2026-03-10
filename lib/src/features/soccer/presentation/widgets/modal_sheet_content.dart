@@ -1,0 +1,98 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:live_score/src/config/app_route.dart';
+import 'package:live_score/src/core/extensions/nums.dart';
+import 'package:live_score/src/core/utils/app_colors.dart';
+
+import 'package:live_score/src/core/domain/entities/league.dart';
+import 'package:live_score/src/core/media_query.dart';
+import 'package:live_score/src/core/utils/app_strings.dart';
+import 'package:live_score/src/core/widgets/custom_image.dart';
+import 'package:live_score/src/features/soccer/presentation/cubit/soccer_cubit.dart';
+
+Future<dynamic> buildBottomSheet({
+  required BuildContext context,
+  required League league,
+  required SoccerCubit cubit,
+}) {
+  return showModalBottomSheet(
+    backgroundColor: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+    context: context,
+    builder: (context) => ModalSheetContent(league: league, cubit: cubit),
+  );
+}
+
+class ModalSheetContent extends StatelessWidget {
+  final League league;
+  final SoccerCubit cubit;
+
+  const ModalSheetContent({
+    super.key,
+    required this.league,
+    required this.cubit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 15),
+      height: context.height / 5,
+      decoration: const BoxDecoration(gradient: AppColors.blueGradient),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomImage(
+                  width: 20.radius,
+                  height: 20.radius,
+                  imageUrl: league.logo,
+                ),
+                SizedBox(width: 5.width),
+                Flexible(
+                  child: Text(
+                    league.name,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    // softWrap: true,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                context.push(Routes.fixtures, extra: league.id);
+                context.pop();
+              },
+              child: Text(
+                AppStrings.viewFixtures,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(color: AppColors.darkBlue),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                context.push(Routes.standings, extra: league.id);
+                context.pop();
+              },
+              child: Text(
+                AppStrings.viewStandings,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(color: AppColors.darkBlue),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
